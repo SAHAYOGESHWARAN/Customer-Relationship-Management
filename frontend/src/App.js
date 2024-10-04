@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import CustomerList from './components/CustomerList';
 import CustomerForm from './components/CustomerForm';
+import Register from './components/Register';
+import Login from './components/Login';
 
 function App() {
     return (
@@ -11,6 +13,8 @@ function App() {
                 <Routes>
                     <Route path="/" element={<CustomerList />} />
                     <Route path="/add-customer" element={<CustomerForm />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/login" element={<Login />} />
                 </Routes>
             </div>
         </Router>
