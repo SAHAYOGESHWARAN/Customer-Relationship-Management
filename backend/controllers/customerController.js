@@ -60,3 +60,24 @@ export const deleteCustomer = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+export const getCustomers = async (req, res) => {
+    const { page = 1, limit = 10 } = req.query;
+
+    try {
+        const customers = await Customer.find()
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .exec();
+
+        const count = await Customer.countDocuments();
+
+        res.json({
+            customers,
+            totalPages: Math.ceil(count / limit),
+            currentPage: page
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
