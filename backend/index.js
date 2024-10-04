@@ -5,9 +5,13 @@ import rateLimit from 'express-rate-limit';
 import authRoutes from './routes/auth.js';
 import customerRoutes from './routes/customers.js';
 import errorMiddleware from './middleware/errorMiddleware.js';
-import logger from './utils/logger.js'; // Logger
+import logger from './utils/logger.js'; 
+import connectDB from './config/db.js';
+
+dotenv.config();
 
 const app = express();
+
 
 // Middleware
 app.use(express.json());
