@@ -78,5 +78,40 @@ const CustomerForm = () => {
         </Container>
     );
 };
+const [errors, setErrors] = useState({});
+
+const handleValidation = () => {
+    let tempErrors = {};
+    let formIsValid = true;
+
+    if (!formData.name) {
+        formIsValid = false;
+        tempErrors["name"] = "Name is required";
+    }
+    if (!formData.email) {
+        formIsValid = false;
+        tempErrors["email"] = "Email is required";
+    }
+    if (!formData.phone) {
+        formIsValid = false;
+        tempErrors["phone"] = "Phone number is required";
+    }
+
+    setErrors(tempErrors);
+    return formIsValid;
+};
+
+const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (handleValidation()) {
+        axios.post('/api/customers', formData, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        })
+            .then(res => console.log(res))
+            .catch(err => console.log(err));
+    }
+};
+
 
 export default CustomerForm;
