@@ -1,0 +1,47 @@
+# Base image
+FROM node:14
+
+# Set working directory
+WORKDIR /app
+
+# Install dependencies
+COPY package*.json .
+# Base image
+FROM node:16
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Copy package.json and install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy the rest of the application code
+COPY . .
+
+# Expose the app port
+EXPOSE 5000
+
+# Command to run the app
+CMD ["npm", "start"]
+# Base image
+FROM node:16
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Copy package.json and install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy the rest of the application code
+COPY . .
+
+# Build the app for production
+RUN npm run build
+
+# Expose the port
+EXPOSE 3000
+
+# Serve the app with a static file server (serve)
+CMD ["npx", "serve", "-s", "build"]
