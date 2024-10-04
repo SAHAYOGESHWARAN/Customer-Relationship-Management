@@ -1,40 +1,43 @@
-// index.js
 import express from 'express';
-import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import helmet from 'helmet';
-import rateLimit from 'express-rate-limit'; 
-import cors from 'cors';
+import rateLimit from 'express-rate-limit';
 import authRoutes from './routes/auth.js';
 import customerRoutes from './routes/customers.js';
-import errorMiddleware from './middleware/errorMiddleware.js';  
-
-dotenv.config();
+import errorMiddleware from './middleware/errorMiddleware.js';
+import logger from './utils/logger.js'; // Logger
 
 const app = express();
-app.use(cors());
+
+// Middleware
 app.use(express.json());
+app.use(helmet());
+
+// Rate Limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, 
+    max: 100,
+});
+app.use(limiter);
+
+// Logging all requests
+app.use((req, res, next) => {
+    logger.info(`${req.method} ${req.url}`);
+    next();
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/customers', customerRoutes);
 
-// Error Middleware (Apply at the end of routes)
+// Error Middleware (Logging errors)
+app.use((err, req, res, next) => {
+    logger.error(err.message);
+    next(err);
+});
 app.use(errorMiddleware);
 
-// Database connection
-mongoose.connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-    .then(() => console.log('MongoDB connected!'))
-    .catch(err => console.log(err));
-
-// Routes
-import customerRoutes from './routes/customers.js';
-app.use('/api/customers', customerRoutes);
-
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true }, () => {
+    app.listen(PORT, () => logger.info(`Server running on port ${PORT}`));
 });
