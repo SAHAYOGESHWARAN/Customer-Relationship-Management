@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Table, TableBody, TableCell, TableHead, TableRow, TextField, Button, Container } from '@mui/material';
 
 const CustomerList = () => {
     const [customers, setCustomers] = useState([]);
@@ -18,20 +19,37 @@ const CustomerList = () => {
     );
 
     return (
-        <div>
+        <Container>
             <h2>Customer List</h2>
-            <input
-                type="text"
-                placeholder="Search by name"
+            <TextField
+                variant="outlined"
+                label="Search by name"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                fullWidth
             />
-            <ul>
-                {filteredCustomers.map(customer => (
-                    <li key={customer._id}>{customer.name} - {customer.email}</li>
-                ))}
-            </ul>
-        </div>
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Email</TableCell>
+                        <TableCell>Phone</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {filteredCustomers.map(customer => (
+                        <TableRow key={customer._id}>
+                            <TableCell>{customer.name}</TableCell>
+                            <TableCell>{customer.email}</TableCell>
+                            <TableCell>{customer.phone}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+            <Button variant="contained" color="primary" style={{ marginTop: '20px' }}>
+                Add New Customer
+            </Button>
+        </Container>
     );
 };
 
