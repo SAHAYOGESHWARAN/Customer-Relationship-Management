@@ -8,10 +8,11 @@ import errorMiddleware from './middleware/errorMiddleware.js';
 import logger from './utils/logger.js'; 
 import connectDB from './config/db.js';
 
+
 dotenv.config();
 
 const app = express();
-
+app.use(errorMiddleware);
 
 // Middleware
 app.use(express.json());
