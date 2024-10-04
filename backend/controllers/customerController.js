@@ -1,5 +1,6 @@
 
 import Customer from '../models/Customer.js';
+import { sendEmail } from '../utils/emailService.js';
 
 // Create a new customer
 export const createCustomer = async (req, res) => {
@@ -77,6 +78,22 @@ export const getCustomers = async (req, res) => {
             totalPages: Math.ceil(count / limit),
             currentPage: page
         });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+export const createCustomer = async (req, res) => {
+    const { name, email, phone } = req.body;
+
+    try {
+        const newCustomer = await Customer.create({ name, email, phone });
+
+        // Send email notification after customer creation
+        sendEmail(email, 'Welcome!', `Hello ${name}, welcome to our service!`);
+
+        res.status(201).json(newCustomer);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
