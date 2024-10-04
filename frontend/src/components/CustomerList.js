@@ -1,22 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, TableBody, TableCell, TableHead, TableRow, TextField, Button, Container } from '@mui/material';
+import { Table, TableBody, TableCell, TableHead, TableRow, TextField, Button, Container, Pagination } from '@mui/material';
 
 const CustomerList = () => {
     const [customers, setCustomers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
     useEffect(() => {
-        axios.get('/api/customers', {
+        axios.get(`/api/customers?page=${page}`, {
             headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         })
-            .then(res => setCustomers(res.data))
+            .then(res => {
+                setCustomers(res.data.customers);
+                setTotalPages(res.data.totalPages);
+            })
             .catch(err => console.log(err));
-    }, []);
+    }, [page]);
 
-    const filteredCustomers = customers.filter(customer => 
-        customer.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const handlePageChange = (event, value) => {
+        setPage(value);
+    };
 
     return (
         <Container>
@@ -37,7 +42,7 @@ const CustomerList = () => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {filteredCustomers.map(customer => (
+                    {customers.map(customer => (
                         <TableRow key={customer._id}>
                             <TableCell>{customer.name}</TableCell>
                             <TableCell>{customer.email}</TableCell>
@@ -46,9 +51,13 @@ const CustomerList = () => {
                     ))}
                 </TableBody>
             </Table>
-            <Button variant="contained" color="primary" style={{ marginTop: '20px' }}>
-                Add New Customer
-            </Button>
+            <Pagination
+                count={totalPages}
+                page={page}
+                onChange={handlePageChange}
+                color="primary"
+                style={{ marginTop: '20px' }}
+            />
         </Container>
     );
 };
