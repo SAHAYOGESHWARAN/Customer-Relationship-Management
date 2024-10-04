@@ -40,3 +40,27 @@ export const loginUser = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+const refreshTokens = [];
+
+export const refreshToken = (req, res) => {
+    const refreshToken = req.body.token;
+    if (!refreshToken) return res.status(401).json({ message: "No token provided" });
+    if (!refreshTokens.includes(refreshToken)) return res.status(403).json({ message: "Invalid refresh token" });
+
+    try {
+        const user = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        const newAccessToken = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        res.json({ accessToken: newAccessToken });
+    } catch (error) {
+        res.status(403).json({ message: "Invalid token" });
+    }
+};
+
+export const loginUser = async (req, res) => {
+    // Existing login logic...
+    const refreshToken = jwt.sign({ id: user._id, role: user.role }, process.env.REFRESH_TOKEN_SECRET);
+    refreshTokens.push(refreshToken);
+
+    res.status(200).json({ user, token: accessToken, refreshToken });
+};
