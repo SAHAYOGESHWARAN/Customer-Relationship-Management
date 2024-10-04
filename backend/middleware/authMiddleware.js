@@ -1,20 +1,40 @@
 import jwt from 'jsonwebtoken';
-const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
+// Generate JWT Token
+const generateToken = (user) => {
+    return jwt.sign(
+        { id: user._id, role: user.role }, 
+        process.env.JWT_SECRET, 
+        { expiresIn: '1h' }
+    );
+};
 
+// Middleware for verifying the token
 const authMiddleware = (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1];
+    // Extract token from the Authorization header
+    const authHeader = req.headers.authorization;
+    
+    // Ensure the token is provided in the correct format
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(403).json({ message: 'Access denied. No token provided.' });
+    }
 
-    if (!token) return res.status(403).json({ message: 'Access denied. No token provided.' });
+    const token = authHeader.split(' ')[1];
 
     try {
+        // Verify the token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+        // Attach user information from token to the request object
         req.userId = decoded.id;
-        req.userRole = decoded.role;  // Extract role from JWT
+        req.userRole = decoded.role;  // Extract role from the JWT
+
+        // Proceed to the next middleware or route handler
         next();
     } catch (error) {
-        res.status(401).json({ message: 'Invalid token' });
+        // Token is invalid or expired
+        res.status(401).json({ message: 'Invalid or expired token' });
     }
 };
 
-export default authMiddleware;
+export { generateToken, authMiddleware };
