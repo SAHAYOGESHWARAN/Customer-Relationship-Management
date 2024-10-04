@@ -1,4 +1,14 @@
 import jwt from 'jsonwebtoken';
+import { authMiddleware } from './middlewares/authMiddleware.js';
+import roleMiddleware from './middlewares/roleMiddleware.js';
+
+app.post('/admin', authMiddleware, roleMiddleware('admin'), (req, res) => {
+    res.send('Admin access granted');
+});
+
+
+
+
 
 // Generate JWT Token
 const generateToken = (user) => {

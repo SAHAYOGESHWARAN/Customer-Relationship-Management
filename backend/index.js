@@ -7,6 +7,7 @@ import customerRoutes from './routes/customers.js';
 import errorMiddleware from './middleware/errorMiddleware.js';
 import logger from './utils/logger.js'; 
 import connectDB from './config/db.js';
+import roleMiddleware from './middlewares/roleMiddleware.js';
 
 
 dotenv.config();
@@ -24,6 +25,16 @@ const limiter = rateLimit({
     max: 100,
 });
 app.use(limiter);
+
+
+// Only 'admin' role can access
+app.get('/admin-only', roleMiddleware('admin'), (req, res) => {
+    res.send('Welcome Admin');
+});
+// 'admin' or 'moderator' roles can access
+app.get('/admin-or-moderator', roleMiddleware(['admin', 'moderator']), (req, res) => {
+    res.send('Welcome Admin or Moderator');
+});
 
 // Logging all requests
 app.use((req, res, next) => {
